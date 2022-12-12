@@ -29,10 +29,10 @@ class suffix_value:
 
 class file_size(suffix_value):
 	suffix_table = dict(
-		k = 2 << 10,
-		m = 2 << 20,
-		g = 2 << 30,
-		t = 2 << 40,
+		k = 1 << 10,
+		m = 1 << 20,
+		g = 1 << 30,
+		t = 1 << 40,
 	)
 
 class cardinal(suffix_value):
@@ -140,6 +140,7 @@ if len(sys.argv) >= 2 and sys.argv[1] == '--complete':
 	exit()
 
 
+#TODO: add query language to help text
 
 parser = argparse.ArgumentParser(add_help=False)
 
