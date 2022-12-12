@@ -2,11 +2,14 @@
 from pathlib import Path
 import re, argparse, os, sys
 from collections import defaultdict
+from query_parser import parse_query
 
-# function _idgrep_complete { IFS=$'\n' COMPREPLY=( $(idgrep --complete $*) ); }; complete -r idgrep; complete -F _idgrep_complete idgrep;
+#note for myself regarding implement tabcompletion at some point:
+#	function _idgrep_complete { IFS=$'\n' COMPREPLY=( $(idgrep --complete $*) ); }; complete -r idgrep; complete -F _idgrep_complete idgrep;
 
 #Known limitations
 #	Overlapping directories are processed twice although the files themselves are not
+
 
 class suffix_value:
 	def __init__(self, value):
@@ -37,8 +40,6 @@ class cardinal(suffix_value):
 		k = 10 ** 3,
 		m = 10 ** 6,
 	)
-
-
 
 
 class search_result:
@@ -144,12 +145,11 @@ parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument('paths', nargs='*', type=Path)
 
-parser.add_argument('-p', '--pattern', default='**/*')
+parser.add_argument('-p', '--file-pattern', default='**/*')
 parser.add_argument('-l', '--limit-size', type=file_size, default='1M')
 parser.add_argument('-i', '--limit-identifiers', type=cardinal, default='1k')
 
 
-#parser.add_argument('-q', '--query')
 
 action = parser.add_mutually_exclusive_group()
 action.add_argument('--help', action='store_const', const='help', dest='action', default='query')
@@ -190,11 +190,9 @@ s = search(
 )
 
 
-
 def process_paths():
 	for path in args.paths or (os.getcwd(),):
-		s.process_directory(path, args.pattern)
-
+		s.process_directory(path, args.file_pattern)
 
 
 if args.action == 'file_id_count':
@@ -216,34 +214,17 @@ if args.action == 'file_id_count':
 
 elif args.action == 'query':
 	if query:
-		#This simple version does not support nested expressions
-		required = set()
-		disallowed = set()
-		optional = set()
+		q = parse_query(' '.join(query))
+
 
 		process_paths()
-
-		for item in query:
-			if item.startswith('+'):
-				required |= s.id_by_glob(item[1:])
-			elif item.startswith('-'):
-				disallowed |= s.id_by_glob(item[1:])
-			else:
-				optional |= s.id_by_glob(item)
 
 		result = list()
 
 		for file, ids in s.by_file.items():
-			if disallowed & ids:
-				continue
-			elif not (required & ids) == required:
-				continue
-			elif disallowed and not optional:
-				result.append((file, None))
 
-			else:
-				if match := ((optional | required) & ids):
-					result.append((file, match))
+			if m := q.query(ids):
+				result.append((file, m.match))
 
 		if args.presentation == 'files_and_optional':
 			for file, match in result:
@@ -264,35 +245,11 @@ elif args.action == 'query':
 		else:
 			raise Exception(args.presentation)
 
-
-		#print('match', args.query)
 	else:
 		parser.print_help()
-
 
 elif args.action == 'help':
 	parser.print_help()
 else:
 	raise Exception()
 
-#s.print_sorted_list(s.by_id)
-
-
-
-
-# s = search()
-# s.process_directory('/home/devilholk/Projects/efforting-mvp', '**/*.py')
-
-#r = s.find_union({'hello', 'world', 'thing', 'stuff'})
-
-
-#print(len( s.get_complement(r).result  ))
-
-# ids = id_by_pattern(r'.*iter.*') - {'__iter__', 'iter'}
-
-# print(len(files_matching_any(ids)))
-
-# ids = {'hello', 'world'}
-
-# for file in files_matching_any(ids):
-# 	print(file, file_map[file] & ids)
