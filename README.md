@@ -54,16 +54,17 @@ Tool for finding identifiers in files. Supports recursive globbing and boolean a
 
 # Notes about shells
 
-Note that in many shells the following characters needs escaping: `!`, `(`, `)`, `&`, `|`, `*`, '?'
+Note that in many shells the following characters needs escaping: `!`, `(`, `)`, `&`, `|`, `*`, `?`
 
 The easiest option is to put the entire query within single (`'`) or double (`"`) quotation marks.
 
 # Usage
 
 ```
-usage: idgrep [-p FILE_PATTERN] [-l LIMIT_SIZE] [-d LIMIT_IDENTIFIERS] [-i] [--help | --file-id-count]
-              [--group-by-id] [--sort-by-name | --sort-by-count | --sort-by-size] [--ascending | --descending]
-              [paths ...] -- query
+usage: idgrep [-p FILE_PATTERN] [-l LIMIT_SIZE] [-d LIMIT_IDENTIFIERS] [-i]
+              [--help | --file-id-count] [--group-by-id]
+              [--sort-by-name | --sort-by-count | --sort-by-size]
+              [--ascending | --descending] [paths ...] -- query
 
 positional arguments:
   [paths] -- query
