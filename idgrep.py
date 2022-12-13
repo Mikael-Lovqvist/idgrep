@@ -4,10 +4,11 @@ import re, argparse, os, sys
 from collections import defaultdict
 from query_parser import parse_query
 
-#todo: add exclusion of directories
+#todo: add specific exclusion/inclusion of directories
 #todo: transform todos into github issues
 #todo: add stay on device flag
 #todo: add sort by mtime, atime
+#todo: add ability to have multiple include/exclude patterns for filenames
 
 #note for myself regarding implement tabcompletion at some point:
 #	function _idgrep_complete { IFS=$'\n' COMPREPLY=( $(idgrep --complete $*) ); }; complete -r idgrep; complete -F _idgrep_complete idgrep;
