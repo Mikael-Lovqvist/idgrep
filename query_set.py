@@ -1,3 +1,5 @@
+import fnmatch
+
 class match:
 	def __init__(self, query, match):
 		self.query = query
@@ -18,15 +20,28 @@ class base_query:
 
 
 class contains_element(base_query):
-	def __init__(self, element):
-		self.element = element
+	def __init__(self, pattern, ignore_case=True):
+		self.ignore_case = ignore_case
+		if self.ignore_case:
+			self.pattern = pattern.lower()
+		else:
+			self.pattern = pattern
 
 	def query(self, collection):
-		if self.element in collection:
-			return match(self, {self.element})
+		result = set()
+		for to_test in collection:
+			if self.ignore_case:
+				if fnmatch.fnmatch(to_test.lower(), self.pattern):
+					result.add(to_test)
+			else:
+				if fnmatch.fnmatch(to_test, self.pattern):
+					result.add(to_test)
+
+		if result:
+			return match(self, result)
 
 	def __repr__(self):
-		return f'{self.element}'
+		return f'{self.pattern}'
 
 class unary_operation(base_query):
 	def __init__(self, reference):

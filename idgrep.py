@@ -4,6 +4,11 @@ import re, argparse, os, sys
 from collections import defaultdict
 from query_parser import parse_query
 
+#todo: add exclusion of directories
+#todo: transform todos into github issues
+#todo: add stay on device flag
+#todo: add sort by mtime, atime
+
 #note for myself regarding implement tabcompletion at some point:
 #	function _idgrep_complete { IFS=$'\n' COMPREPLY=( $(idgrep --complete $*) ); }; complete -r idgrep; complete -F _idgrep_complete idgrep;
 
@@ -148,8 +153,8 @@ parser.add_argument('paths', nargs='*', type=Path)
 
 parser.add_argument('-p', '--file-pattern', default='**/*')
 parser.add_argument('-l', '--limit-size', type=file_size, default='1M')
-parser.add_argument('-i', '--limit-identifiers', type=cardinal, default='1k')
-
+parser.add_argument('-d', '--limit-identifiers', type=cardinal, default='1k')
+parser.add_argument('-i', '--ignore-case', default=False, action='store_const', const=True)
 
 
 action = parser.add_mutually_exclusive_group()
@@ -215,7 +220,7 @@ if args.action == 'file_id_count':
 
 elif args.action == 'query':
 	if query:
-		q = parse_query(' '.join(query))
+		q = parse_query(' '.join(query), ignore_case=args.ignore_case)
 
 
 		process_paths()

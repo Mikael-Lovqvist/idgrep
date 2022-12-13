@@ -2,28 +2,31 @@ import query_set
 from collections import deque
 
 
-def parse_query(text):
+#todo: make sure [] is balanced in fnmatch pattern
+
+def parse_query(text, ignore_case=False):
 
 	def tokenize():
-		pending_identifier = ''
+		pending_pattern = ''
 
-		def possible_identifier():
-			nonlocal pending_identifier
-			if pending_identifier:
-				assert pending_identifier.isidentifier()
-				yield pending_identifier
-			pending_identifier = ''
+		def possible_pattern():
+			nonlocal pending_pattern
+			if pending_pattern:
+				#We skip testing for identifier here since it gets complicated with the fnmatch stuff - we can possibly do something later on
+				#	since it is nice to be able to inform the user when problems are detected.
+				yield pending_pattern
+			pending_pattern = ''
 
 
 		for c in text:
-			if c.isalnum():
-				pending_identifier += c
+			if c.isalnum() or c in '*?[]':
+				pending_pattern += c
 			elif c.isspace():
-				yield from possible_identifier()
+				yield from possible_pattern()
 			elif c in '()!~|&^':
-				yield from possible_identifier()
+				yield from possible_pattern()
 				yield c
-		yield from possible_identifier()
+		yield from possible_pattern()
 
 
 	stack = deque((deque(),))
@@ -32,7 +35,7 @@ def parse_query(text):
 		if token == '(':
 			stack.append(deque())
 		elif token == ')':
-			[sub_expression] = stack.pop()
+			[sub_expression] = stack.pop()	#todo: make sure that an empty stack raises a parserexception (to be defined)
 			stack[-1].append(sub_expression)
 		elif token in '!~':
 			stack[-1].append(query_set.logical_not)
@@ -42,8 +45,8 @@ def parse_query(text):
 			stack[-1].append(query_set.logical_and)
 		elif token == '^':
 			stack[-1].append(query_set.logical_xor)
-		else:	#identifier
-			stack[-1].append(query_set.contains_element(token))
+		else:	#pattern
+			stack[-1].append(query_set.contains_element(token, ignore_case=ignore_case))
 
 		#Check stack
 
