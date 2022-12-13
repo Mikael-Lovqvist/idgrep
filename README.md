@@ -3,9 +3,6 @@ Tool for finding identifiers in files. Supports recursive globbing and boolean a
 
 # Examples
 
-[//]: # (Todo: make a set of mock files to demonstrate output as well for these examples)
-[//]: # (Todo: Add explanation on how identifiers are included in results, noting that negated ones are empty sets to avoid a terrible mess)
-
 + Find all files that contains `cats`, `dogs` or both.
 
   ```console
@@ -16,6 +13,7 @@ Tool for finding identifiers in files. Supports recursive globbing and boolean a
 
   - `fish` without `cats` or `dogs`
   - `cats` or `dogs` without `fish`
+
 
   ```console
   $ idgrep -- 'fish ^ (cats | dogs)'

@@ -4,18 +4,6 @@ import re, argparse, os, sys
 from collections import defaultdict
 from query_parser import parse_query
 
-#todo: add specific exclusion/inclusion of directories
-#todo: transform todos into github issues
-#todo: add stay on device flag
-#todo: add sort by mtime, atime
-#todo: add ability to have multiple include/exclude patterns for filenames
-
-#note for myself regarding implement tabcompletion at some point:
-#	function _idgrep_complete { IFS=$'\n' COMPREPLY=( $(idgrep --complete $*) ); }; complete -r idgrep; complete -F _idgrep_complete idgrep;
-
-#Known limitations
-#	Overlapping directories are processed twice although the files themselves are not
-
 
 class suffix_value:
 	def __init__(self, value):
@@ -70,9 +58,6 @@ class search:
 
 	def process_directory(self, path, glob):
 		for file in Path(path).glob(glob):
-
-			#Idea here is that later we will have a timed event so if we have been doing something for a while we start outputting some stats about the process - this is still just a concept
-			#  f'Processing file {file}'
 
 			if file in self.by_file:
 				#Already done this one
